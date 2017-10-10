@@ -8,91 +8,121 @@ const double POISON = atan(M_PI);
 
 typedef double StackElem_t;
 
-//struct CStack {
- //   StackElem_t *data;
-//    int count;
-//};
+#define ASSERT_OK() if(!StackOK(str1))        \
+                        {                     \
+                        StackDump(str1);      \
+                        assert(!"!!!");       \
+                        }                     \
 
-void StackDump(CStack *s);
+FILE *f = fopen("log.txt", "w+");
 
-void StackConstruct(CStack *s);
-
-void StackPush(CStack *s, StackElem_t num);
-
-StackElem_t StackPop(CStack *s);
-
-void StackDestruct(CStack *s);
-
-bool StackOK(const CStack *s);
-
-class Stack {
-private:
-    struct CStack {
-        StackElem_t *data;
-        int count;
-    };
-public:
-    void push(CStack *s, StackElem_t num) {
-        if (s->count < NMAX)
-            s->data[s->count++] = num;
-        else
-            std::cout << "Stack is full" << std::endl;
-    }
-
+struct CStack {
+    double canary1 = POISON;
+    StackElem_t *data;
+    int count;
+    StackElem_t hash_sum;
+    double canary2 = POISON;
 };
+
+void StackDump(CStack *str1);
+
+void StackConstruct(CStack *str1);
+
+int StackPush(CStack *str1, StackElem_t num);
+
+StackElem_t StackPop(CStack *str1);
+
+void StackDestruct(CStack *str1);
+
+bool StackOK(CStack *str1);
+
+StackElem_t hash(CStack *str1);
 
 
 int main() {
 
-    StackElem_t num = 0;
-    int chek = 0;
+    CStack str1 = {};
+    StackConstruct(&str1);
 
-    CStack s = {};
-    StackConstruct(&s);
-    chek = StackPush(&s, num);
-    if (chek = POISON) {
-
-
-    }
-    StackElem_t val = StackPop(&s);
-    StackDestruct(&s);
     return 0;
 }
 
 
-void StackConstruct(CStack *s) {
-    s->data = (StackElem_t *) calloc(sizeof(s), NMAX);
-    s->count = 0;
+void StackConstruct(CStack *str1) {
+    str1->count = 0;
+
+    str1->data = (StackElem_t *) calloc(sizeof(str1->data), NMAX + 3);
+    if (str1->data == NULL)
+        exit(2);
+    str1->data[0] = POISON;
+    str1->data[NMAX + 2] = POISON;
+    str1->data++;
+    str1->hash_sum = hash(str1);
+    ASSERT_OK()
 }
 
 
-void push(CStack *s, StackElem_t num) {
-    if (s->count < NMAX)
-        s->data[s->count++] = num;
-    else
+int StackPush(CStack *str1, StackElem_t value) {
+    ASSERT_OK()
+    if (str1->count < NMAX) {
+        str1->data[str1->count++] = value;
+        str1->hash_sum = hash(str1);
+    } else {
         std::cout << "Stack is full" << std::endl;
-}
-
-StackElem_t StackPop(CStack *s) {
-    if (s->count > 0)
-        return s->data[s->count--];
-    else
-        std::cout << "Stack is end" << std::endl;/////////////////ifami
+        return 1;
+    }
+    ASSERT_OK()
     return 0;
 }
 
-void StackDestruct(CStack *s) {
-    s->count = 0;
-    free(s->data);
+StackElem_t StackPop(CStack *str1) {
+
+    StackElem_t elem = 0;
+    ASSERT_OK()
+
+    if (str1->count >= 0) {
+        elem = str1->data[--str1->count];
+        str1->hash_sum = hash(str1);
+        return elem;
+    } else
+        std::cout << "Stack is end" << std::endl;
+    ASSERT_OK()
 }
 
-bool StackOK(CStack *s) {
-    return s && s->count >= 0 && s->data && s->count < NMAX;
+void StackDestruct(CStack *str1) {
+    ASSERT_OK()
+    str1->count = -1;
+    free(str1->data - 1);
+}
+
+bool StackOK(CStack *str1) {
+    return str1->count >= 0
+           && str1->data
+           && str1->count <= NMAX
+           && str1->canary1 == POISON
+           && str1->canary2 == POISON
+           && str1->data[-1] == POISON
+           && str1->data[NMAX + 1] == POISON
+           && str1->hash_sum == hash(str1);
 }
 
 
-void StackDump(CStack *s) {
-    FILE *f = fopen("log.txt", "a");
-    fprintf(f, "error in StackDump");////////////////////zapilit, classes
-    fclose(f);
+void StackDump(CStack *str1) {
+
+    fprintf(f, "Stack (ERROR!!!)\n");
+    fprintf(f, "count = %d\n", str1->count);
+    fprintf(f, "data[NMAX] %p = \n", str1->data);
+    for (int i = 0; i <= NMAX; i++)
+        fprintf(f, "[%d] = %f\n", i, str1->data[i]);
+    fflush(f);
+}
+
+
+StackElem_t hash(CStack *str1) {
+
+    StackElem_t sum = 0;
+
+    for (int i = 0; i <= NMAX; i++, sum += str1->data[i + 1]);
+    sum += str1->count;
+    return sum;
 }
