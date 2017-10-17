@@ -1,3 +1,9 @@
+//! @file main.cpp
+//! @mainpage
+//! @date 26.09.2017
+//! @author Andrew Nadezhin
+//! Struct Stack
+
 #include <iostream>
 #include <cassert>
 #include <math.h>
@@ -47,6 +53,14 @@ int main() {
     return 0;
 }
 
+//----------------------------------------------------------
+//! Create Stack
+//!
+//!@param [IN] str1 pointer on struct stack
+//!
+//!@note in case of error assert
+//!
+//----------------------------------------------------------
 
 void StackConstruct(CStack *str1) {
     str1->count = 0;
@@ -61,6 +75,15 @@ void StackConstruct(CStack *str1) {
     ASSERT_OK()
 }
 
+//----------------------------------------------------------
+//! Push element in Stack
+//!
+//!@param [IN] str1 pointer on struct stack
+//!@param [OUT] value element which we push in stack
+//!
+//!@return code of error
+//!
+//----------------------------------------------------------
 
 int StackPush(CStack *str1, StackElem_t value) {
     ASSERT_OK()
@@ -74,6 +97,15 @@ int StackPush(CStack *str1, StackElem_t value) {
     ASSERT_OK()
     return 0;
 }
+
+//-------------------------------------------------------------
+//! Return upper element in Stack
+//!
+//!@param [IN] str1 pointer on struct stack
+//!
+//!@return upper element
+//!
+//-------------------------------------------------------------
 
 StackElem_t StackPop(CStack *str1) {
 
@@ -89,11 +121,29 @@ StackElem_t StackPop(CStack *str1) {
     ASSERT_OK()
 }
 
+//----------------------------------------------------------
+//! Destruct Stack
+//!
+//!@param [IN] str1 pointer on struct stack
+//!
+//!@note in case of error assert
+//!
+//----------------------------------------------------------
+
 void StackDestruct(CStack *str1) {
     ASSERT_OK()
     str1->count = -1;
     free(str1->data - 1);
 }
+
+//----------------------------------------------------------
+//! function which check errors
+//!
+//!@param [IN] str1 pointer on struct stack
+//!
+//!@return 1 if find error or 0 if error not found
+//!
+//----------------------------------------------------------
 
 bool StackOK(CStack *str1) {
     return str1->count >= 0
@@ -106,6 +156,12 @@ bool StackOK(CStack *str1) {
            && str1->hash_sum == hash(str1);
 }
 
+//----------------------------------------------------------
+//! function which print information in log file
+//!
+//!@param [IN] str1 pointer on struct stack
+//!
+//----------------------------------------------------------
 
 void StackDump(CStack *str1) {
 
@@ -117,6 +173,14 @@ void StackDump(CStack *str1) {
     fflush(f);
 }
 
+//----------------------------------------------------------
+//! hash function which calculate sum all elements
+//!
+//!@param [IN] str1 pointer on struct stack
+//!
+//!@return sum all elements
+//!
+//----------------------------------------------------------
 
 StackElem_t hash(CStack *str1) {
 
